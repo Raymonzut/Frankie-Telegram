@@ -1,4 +1,6 @@
-import Constants as keys
+import os
+
+from dotenv import load_dotenv
 from telegram.ext import *
 import Responses as R
 
@@ -18,8 +20,8 @@ def handle_message(update, context):
 def error(update, context):
     print(f"Update {update} caused error {context.error}")
 
-def main():
-    updater = Updater(keys.API_KEY, use_context=True)
+def main(api_key):
+    updater = Updater(api_key, use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start_command))
@@ -34,4 +36,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    load_dotenv()
+    main(os.getenv('API_KEY'))
