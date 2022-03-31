@@ -1,34 +1,43 @@
+"""A telegram chatbot executing the behavior from the commands module"""
+
+
 import os
 
 from dotenv import load_dotenv
-from telegram.ext import *
+from telegram.ext import (CommandHandler, MessageHandler, Filters, Updater)
 
-from Commands import add_command_handlers
-import Responses
+from commands import add_command_handlers
+import responses
 
 
-def handle_message(update, context):
+def __handle_message(update, _context):
     text = str(update.message.text).lower()
-    response = Responses.sample_responses(text)
+    response = responses.sample_responses(text)
     update.message.reply_text(response)
 
 
-def error(update, context):
+def __error(update, context):
     print(f"Update {update} caused error {context.error}")
 
 
-def add_handlers(dispatcher):
+def __add_handlers(dispatcher):
     add_command_handlers(lambda c: dispatcher.add_handler(CommandHandler(c['name'], c['action'])))
 
-    dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
-    dispatcher.add_error_handler(error)
+    dispatcher.add_handler(MessageHandler(Filters.text, __handle_message))
+    dispatcher.add_error_handler(__error)
 
     return dispatcher
 
 
 def main(api_key):
+    """Run a telegram chatbot
+
+
+       Parameters:
+       api_key: for authenticating the bot
+    """
     updater = Updater(api_key, use_context=True)
-    add_handlers(updater.dispatcher)
+    __add_handlers(updater.dispatcher)
 
     updater.start_polling(5)
     updater.idle()
